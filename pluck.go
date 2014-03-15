@@ -59,6 +59,16 @@ func pluckStruct(rv reflect.Value, fs fieldSet) interface{} {
 	result := make(map[string]interface{})
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
+		if field.Anonymous {
+			base := pluckStruct(rv.Field(i), fs)
+			for key, val := range base.(map[string]interface{}) {
+				if _, ok := result[key]; !ok {
+					result[key] = val
+				}
+			}
+			continue
+		}
+
 		name, omitempty := getTag(field)
 		if name == "" {
 			name = field.Name

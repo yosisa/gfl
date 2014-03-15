@@ -22,6 +22,15 @@ type case3 struct {
 	D []string `json:"d,omitempty"`
 }
 
+type case4 struct {
+	case1
+}
+
+type case5 struct {
+	case1
+	A int `json:"a"`
+}
+
 func TestFieldSet(t *testing.T) {
 	fs1 := fieldSet{"a": nil, "b": nil}
 	assert.Equal(t, newFieldSet("a", "b"), fs1)
@@ -59,4 +68,11 @@ func TestPluckFromSlice(t *testing.T) {
 func TestPluckWithTags(t *testing.T) {
 	item := case3{}
 	assert.Equal(t, Pluck(item, "a", "b"), map[string]interface{}{"a": false})
+}
+
+func TestPluckFromAnonymous(t *testing.T) {
+	c1 := case4{case1{"a", 1}}
+	assert.Equal(t, Pluck(c1, "a", "b", "B"), map[string]interface{}{"a": "a", "B": 1})
+	c2 := case5{case1{"a", 1}, 0}
+	assert.Equal(t, Pluck(c2, "a", "B"), map[string]interface{}{"a": 0, "B": 1})
 }
