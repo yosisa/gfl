@@ -85,9 +85,10 @@ func pluckStruct(rv reflect.Value, fs fieldSet) interface{} {
 }
 
 func pluckSlice(v reflect.Value, fs fieldSet) []interface{} {
-	var result []interface{}
-	for i := 0; i < v.Len(); i++ {
-		result = append(result, pluck(v.Index(i), fs))
+	size := v.Len()
+	result := make([]interface{}, size)
+	for i := 0; i < size; i++ {
+		result[i] = pluck(v.Index(i), fs)
 	}
 	return result
 }
