@@ -1,4 +1,4 @@
-package gfl
+package gofl
 
 import (
 	"github.com/stretchr/testify/assert"

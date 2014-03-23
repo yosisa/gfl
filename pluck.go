@@ -1,4 +1,4 @@
-package gfl
+package gofl
 
 import (
 	"reflect"
