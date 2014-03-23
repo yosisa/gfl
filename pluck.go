@@ -44,6 +44,7 @@ func pluck(v reflect.Value, fs fieldSet) interface{} {
 		return v.Interface()
 	}
 
+	v = reflect.Indirect(v)
 	switch v.Kind() {
 	case reflect.Struct:
 		return pluckStruct(v, fs)

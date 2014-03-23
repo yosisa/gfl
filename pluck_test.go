@@ -44,6 +44,7 @@ func TestPluckFromStruct(t *testing.T) {
 	assert.Equal(t, Pluck(item, "a"), map[string]interface{}{"a": "a"})
 	assert.Equal(t, Pluck(item, "b"), map[string]interface{}{})
 	assert.Equal(t, Pluck(item, "B"), map[string]interface{}{"B": 0})
+	assert.Equal(t, Pluck(&item, "a"), map[string]interface{}{"a": "a"})
 }
 
 func TestPluckFromNestedStruct(t *testing.T) {
@@ -60,6 +61,10 @@ func TestPluckFromSlice(t *testing.T) {
 	items := []case1{case1{"a1", 0}, case1{"a2", 1}}
 	assert.Equal(t, Pluck(items), items)
 	assert.Equal(t, Pluck(items, "a"), []interface{}{
+		map[string]interface{}{"a": "a1"},
+		map[string]interface{}{"a": "a2"},
+	})
+	assert.Equal(t, Pluck(&items, "a"), []interface{}{
 		map[string]interface{}{"a": "a1"},
 		map[string]interface{}{"a": "a2"},
 	})
