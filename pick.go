@@ -33,13 +33,13 @@ func newFieldSet(fields ...string) fieldSet {
 	return fs
 }
 
-func Pluck(v interface{}, fields ...string) interface{} {
+func Pick(v interface{}, fields ...string) interface{} {
 	rv := reflect.ValueOf(v)
 	fs := newFieldSet(fields...)
-	return pluck(rv, fs)
+	return pick(rv, fs)
 }
 
-func pluck(v reflect.Value, fs fieldSet) interface{} {
+func pick(v reflect.Value, fs fieldSet) interface{} {
 	if fs == nil {
 		return v.Interface()
 	}
@@ -47,21 +47,21 @@ func pluck(v reflect.Value, fs fieldSet) interface{} {
 	v = reflect.Indirect(v)
 	switch v.Kind() {
 	case reflect.Struct:
-		return pluckStruct(v, fs)
+		return pickStruct(v, fs)
 	case reflect.Slice:
-		return pluckSlice(v, fs)
+		return pickSlice(v, fs)
 	default:
 		return v.Interface()
 	}
 }
 
-func pluckStruct(rv reflect.Value, fs fieldSet) interface{} {
+func pickStruct(rv reflect.Value, fs fieldSet) interface{} {
 	rt := rv.Type()
 	result := make(map[string]interface{})
 	for i := 0; i < rt.NumField(); i++ {
 		field := rt.Field(i)
 		if field.Anonymous {
-			base := pluckStruct(rv.Field(i), fs)
+			base := pickStruct(rv.Field(i), fs)
 			for key, val := range base.(map[string]interface{}) {
 				if _, ok := result[key]; !ok {
 					result[key] = val
@@ -79,17 +79,17 @@ func pluckStruct(rv reflect.Value, fs fieldSet) interface{} {
 		}
 
 		if subfs, ok := fs[name]; ok {
-			result[name] = pluck(rv.Field(i), subfs)
+			result[name] = pick(rv.Field(i), subfs)
 		}
 	}
 	return result
 }
 
-func pluckSlice(v reflect.Value, fs fieldSet) []interface{} {
+func pickSlice(v reflect.Value, fs fieldSet) []interface{} {
 	size := v.Len()
 	result := make([]interface{}, size)
 	for i := 0; i < size; i++ {
-		result[i] = pluck(v.Index(i), fs)
+		result[i] = pick(v.Index(i), fs)
 	}
 	return result
 }
