@@ -74,7 +74,7 @@ func pickStruct(rv reflect.Value, fs fieldSet) interface{} {
 		if name == "" {
 			name = field.Name
 		}
-		if omitempty && isEmpty(rv.Field(i)) {
+		if omitempty && isEmptyValue(rv.Field(i)) {
 			continue
 		}
 
@@ -105,11 +105,23 @@ func getTag(field reflect.StructField) (name string, omitempty bool) {
 	return
 }
 
-func isEmpty(v reflect.Value) bool {
+// isEmptyValue returns true if given v is zero value.
+// Almost all code of this function is borrowed from encoding/json package.
+func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
-	case reflect.Slice:
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		return v.Len() == 0
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return v.Float() == 0
+	case reflect.Interface, reflect.Ptr:
 		return v.IsNil()
 	default:
-		return v.Interface() == reflect.Zero(v.Type()).Interface()
+		return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 	}
 }

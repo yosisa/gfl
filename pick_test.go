@@ -1,8 +1,9 @@
 package gofl
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type case1 struct {
@@ -29,6 +30,16 @@ type case4 struct {
 type case5 struct {
 	case1
 	A int `json:"a"`
+}
+
+type case6 struct {
+	A case1          `json:"a,omitempty"`
+	B map[string]int `json:"b,omitempty"`
+	C []int          `json:"c,omitempty"`
+}
+
+type case7 struct {
+	A case6 `json:"a,omitempty"`
 }
 
 func TestFieldSet(t *testing.T) {
@@ -80,4 +91,11 @@ func TestPickFromAnonymous(t *testing.T) {
 	assert.Equal(t, Pick(c1, "a", "b", "B"), map[string]interface{}{"a": "a", "B": 1})
 	c2 := case5{case1{"a", 1}, 0}
 	assert.Equal(t, Pick(c2, "a", "B"), map[string]interface{}{"a": 0, "B": 1})
+}
+
+func TestPickWithOmitempty(t *testing.T) {
+	c1 := case6{}
+	assert.Equal(t, Pick(c1, "a", "b", "c"), map[string]interface{}{})
+	c2 := case7{}
+	assert.Equal(t, Pick(c2, "a"), map[string]interface{}{})
 }
