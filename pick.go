@@ -74,13 +74,14 @@ func pickStruct(rv reflect.Value, fs fieldSet) interface{} {
 		if name == "" {
 			name = field.Name
 		}
+		subfs, ok := fs[name]
+		if !ok {
+			continue
+		}
 		if omitempty && isEmptyValue(rv.Field(i)) {
 			continue
 		}
-
-		if subfs, ok := fs[name]; ok {
-			result[name] = pick(rv.Field(i), subfs)
-		}
+		result[name] = pick(rv.Field(i), subfs)
 	}
 	return result
 }
